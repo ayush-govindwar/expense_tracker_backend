@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
         name = "budgets",
         uniqueConstraints = @UniqueConstraint(
                 name = "uk_budget_user_category_period",
-                columnNames = {"user_id", "category_id", "month", "year"}
+                columnNames = {"user_id", "category_id", "budget_month", "budget_year"}
         )
 )
 public class Budget {
@@ -40,10 +40,10 @@ public class Budget {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
-    @Column(nullable = false)
+    @Column(name = "budget_month", nullable = false)
     private int month;
 
-    @Column(nullable = false)
+    @Column(name = "budget_year", nullable = false)
     private int year;
 
     @CreationTimestamp

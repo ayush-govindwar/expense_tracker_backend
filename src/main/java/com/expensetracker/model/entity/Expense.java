@@ -35,7 +35,7 @@ public class Expense {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 2000)
     private String comments;
 
     @Column(name = "expense_date", nullable = false)
