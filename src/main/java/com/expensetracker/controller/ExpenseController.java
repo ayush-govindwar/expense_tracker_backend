@@ -49,6 +49,21 @@ public class ExpenseController {
                 principal.getId(), categoryId, from, to, minAmount, maxAmount, pageable);
     }
 
+    @GetMapping("/search")
+    public PagedResponse<ExpenseResponse> search(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) BigDecimal minAmount,
+            @RequestParam(required = false) BigDecimal maxAmount,
+            @RequestParam(required = false) String paymentMethod,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return expenseService.search(
+                principal.getId(), q, category, from, to, minAmount, maxAmount, paymentMethod, pageable);
+    }
+
     @GetMapping("/{id}")
     public ExpenseResponse getById(
             @AuthenticationPrincipal UserPrincipal principal,

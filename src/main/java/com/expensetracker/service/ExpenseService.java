@@ -48,6 +48,24 @@ public class ExpenseService {
         return PagedResponse.from(page, content);
     }
 
+    public PagedResponse<ExpenseResponse> search(
+            Long userId,
+            String q,
+            String category,
+            LocalDate from,
+            LocalDate to,
+            BigDecimal minAmount,
+            BigDecimal maxAmount,
+            String paymentMethod,
+            Pageable pageable) {
+
+        Specification<Expense> spec = buildSearchSpec(
+                userId, q, category, from, to, minAmount, maxAmount, paymentMethod);
+        Page<Expense> page = expenseRepository.findAll(spec, pageable);
+        List<ExpenseResponse> content = page.getContent().stream().map(this::toResponse).toList();
+        return PagedResponse.from(page, content);
+    }
+
     public ExpenseResponse getById(Long userId, Long id) {
         Expense expense = expenseRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
@@ -102,6 +120,44 @@ public class ExpenseService {
         }
         if (maxAmount != null) {
             specs.add(ExpenseSpecifications.maxAmount(maxAmount));
+        }
+
+        return Specification.allOf(specs);
+    }
+
+    private Specification<Expense> buildSearchSpec(
+            Long userId,
+            String q,
+            String category,
+            LocalDate from,
+            LocalDate to,
+            BigDecimal minAmount,
+            BigDecimal maxAmount,
+            String paymentMethod) {
+
+        List<Specification<Expense>> specs = new ArrayList<>();
+        specs.add(ExpenseSpecifications.forUser(userId));
+
+        if (q != null && !q.isBlank()) {
+            specs.add(ExpenseSpecifications.commentsContain(q.trim()));
+        }
+        if (category != null && !category.isBlank()) {
+            specs.add(ExpenseSpecifications.categoryName(category.trim()));
+        }
+        if (from != null) {
+            specs.add(ExpenseSpecifications.expenseDateFrom(from));
+        }
+        if (to != null) {
+            specs.add(ExpenseSpecifications.expenseDateTo(to));
+        }
+        if (minAmount != null) {
+            specs.add(ExpenseSpecifications.minAmount(minAmount));
+        }
+        if (maxAmount != null) {
+            specs.add(ExpenseSpecifications.maxAmount(maxAmount));
+        }
+        if (paymentMethod != null && !paymentMethod.isBlank()) {
+            specs.add(ExpenseSpecifications.paymentMethod(paymentMethod.trim()));
         }
 
         return Specification.allOf(specs);

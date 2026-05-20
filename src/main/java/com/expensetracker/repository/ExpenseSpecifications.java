@@ -34,4 +34,19 @@ public final class ExpenseSpecifications {
     public static Specification<Expense> maxAmount(BigDecimal max) {
         return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("amount"), max);
     }
+
+    public static Specification<Expense> commentsContain(String q) {
+        String pattern = "%" + q.toLowerCase() + "%";
+        return (root, query, cb) -> cb.like(cb.lower(root.get("comments")), pattern);
+    }
+
+    public static Specification<Expense> categoryName(String name) {
+        return (root, query, cb) ->
+                cb.equal(cb.lower(root.get("category").get("name")), name.toLowerCase());
+    }
+
+    public static Specification<Expense> paymentMethod(String method) {
+        return (root, query, cb) ->
+                cb.equal(cb.upper(root.get("paymentMethod")), method.toUpperCase());
+    }
 }
