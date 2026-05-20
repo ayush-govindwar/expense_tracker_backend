@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
+    long countByDefaultCategoryTrue();
+
     @Query("""
             SELECT c FROM Category c
             WHERE c.defaultCategory = true OR c.user.id = :userId
