@@ -41,14 +41,7 @@ Profiles: `local`, `supabase`, `test`. Config can load from `.env` (see `applica
 mvn spring-boot:run
 ```
 
-Default port: **8081** (or `PORT` in production).
-
-Docker:
-
-```bash
-docker build -t expense-tracker .
-docker run -p 8081:8081 --env-file .env expense-tracker
-```
+Default port: **8081** (or `PORT` in production)
 
 ---
 
