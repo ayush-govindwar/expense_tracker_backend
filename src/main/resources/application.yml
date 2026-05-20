@@ -33,4 +33,4 @@ ocr:
   api-key: ${OCR_API_KEY:}
 
 server:
-  port: 8081
+  port: ${PORT:8081}
