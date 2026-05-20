@@ -20,7 +20,45 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>, JpaSpec
 
     Optional<Expense> findByIdAndUserId(Long id, Long userId);
 
+    long countByUserIdAndExpenseDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
+
+    @Query("""
+            SELECT e FROM Expense e
+            JOIN FETCH e.category
+            WHERE e.user.id = :userId
+              AND e.expenseDate >= :startDate
+              AND e.expenseDate <= :endDate
+            ORDER BY e.amount DESC
+            """)
+    List<Expense> findBiggestExpensesForUserAndDateRange(
+            @Param("userId") Long userId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("""
+            SELECT e FROM Expense e
+            JOIN FETCH e.category
+            WHERE e.user.id = :userId
+              AND e.expenseDate >= :startDate
+              AND e.expenseDate <= :endDate
+            ORDER BY e.expenseDate DESC, e.id DESC
+            """)
+    List<Expense> findForPdfTransactions(
+            @Param("userId") Long userId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
     List<Expense> findByRecurringTrue();
+
+    @Query("""
+            SELECT DISTINCT e FROM Expense e
+            JOIN FETCH e.user
+            JOIN FETCH e.category
+            WHERE e.recurring = true
+            """)
+    List<Expense> findRecurringTemplates();
 
     @Query("""
             SELECT COALESCE(SUM(e.amount), 0) FROM Expense e

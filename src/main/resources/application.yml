@@ -27,7 +27,7 @@ jwt:
   refresh-expiry: 604800000
 
 app:
-  cors-allowed-origins: http://localhost:3000
+  cors-allowed-origins: http://localhost:3000,http://localhost:5173
 
 ocr:
   api-key: ${OCR_API_KEY:}
