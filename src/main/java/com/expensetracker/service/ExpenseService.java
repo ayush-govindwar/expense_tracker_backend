@@ -27,10 +27,15 @@ public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
     private final CategoryRepository categoryRepository;
+    private final BudgetService budgetService;
 
-    public ExpenseService(ExpenseRepository expenseRepository, CategoryRepository categoryRepository) {
+    public ExpenseService(
+            ExpenseRepository expenseRepository,
+            CategoryRepository categoryRepository,
+            BudgetService budgetService) {
         this.expenseRepository = expenseRepository;
         this.categoryRepository = categoryRepository;
+        this.budgetService = budgetService;
     }
 
     public PagedResponse<ExpenseResponse> list(
@@ -76,7 +81,9 @@ public class ExpenseService {
     public ExpenseResponse create(UserPrincipal principal, ExpenseRequest request) {
         Category category = resolveCategory(principal.getId(), request.getCategoryId());
         Expense expense = mapRequestToEntity(new Expense(), request, category, principal);
-        return toResponse(expenseRepository.save(expense));
+        Expense saved = expenseRepository.save(expense);
+        budgetService.checkAlerts(principal.getId(), saved.getExpenseDate());
+        return toResponse(saved);
     }
 
     @Transactional
@@ -85,7 +92,9 @@ public class ExpenseService {
                 .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
         Category category = resolveCategory(principal.getId(), request.getCategoryId());
         mapRequestToEntity(expense, request, category, principal);
-        return toResponse(expenseRepository.save(expense));
+        Expense saved = expenseRepository.save(expense);
+        budgetService.checkAlerts(principal.getId(), saved.getExpenseDate());
+        return toResponse(saved);
     }
 
     @Transactional
